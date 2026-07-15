@@ -19,6 +19,7 @@ let lastRefreshStartedAt = null;
 let currentState = {
   status: 'loading',
   balanceText: '--',
+  resetAtText: null,
   rawText: '',
   lastUpdated: null,
   error: null,
@@ -119,24 +120,36 @@ function createDashboardWindow() {
 
 function extractBalanceText(rawText) {
   const text = rawText.replace(/\r/g, '').trim();
-  if (!text) return { balanceText: '--', reason: 'empty' };
+  if (!text) return { balanceText: '--', resetAtText: null, reason: 'empty' };
 
   const lines = text
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
 
+  let resetAtText = null;
+  const resetLineIndex = lines.findIndex((line) => /重設時間|reset time/i.test(line));
+  if (resetLineIndex !== -1) {
+    const resetLine = lines[resetLineIndex];
+    const inlineMatch = resetLine.match(/(?:重設時間|reset time)\s*:?\s*(.+)$/i);
+    if (inlineMatch?.[1]) {
+      resetAtText = inlineMatch[1].trim();
+    } else if (lines[resetLineIndex + 1]) {
+      resetAtText = lines[resetLineIndex + 1].trim();
+    }
+  }
+
   const percentRemainingLine = lines.find((line) => /(\d+(?:\.\d+)?)%\s*剩餘/.test(line));
   if (percentRemainingLine) {
     const match = percentRemainingLine.match(/(\d+(?:\.\d+)?)%\s*剩餘/);
-    if (match) return { balanceText: `${match[1]}% 剩餘`, reason: 'percent-zh' };
+    if (match) return { balanceText: `${match[1]}% 剩餘`, resetAtText, reason: 'percent-zh' };
   }
 
   const limitCardLine = lines.find((line) => /每週用量上限|weekly usage limit/i.test(line));
   if (limitCardLine) {
     const nearby = lines.slice(Math.max(0, lines.indexOf(limitCardLine)), Math.min(lines.length, lines.indexOf(limitCardLine) + 4)).join(' ');
     const match = nearby.match(/(\d+(?:\.\d+)?)%\s*剩餘/);
-    if (match) return { balanceText: `${match[1]}% 剩餘`, reason: 'limit-card' };
+    if (match) return { balanceText: `${match[1]}% 剩餘`, resetAtText, reason: 'limit-card' };
   }
 
   const creditsRemainingIndex = lines.findIndex((line) => /剩餘積分|remaining credits?/i.test(line));
@@ -144,32 +157,33 @@ function extractBalanceText(rawText) {
     const windowText = lines.slice(creditsRemainingIndex, creditsRemainingIndex + 3).join(' ');
     const match = windowText.match(/(?:剩餘積分|remaining credits?)\s*:?\s*([0-9]+(?:\.[0-9]{1,2})?)/i)
       || windowText.match(/\b([0-9]+(?:\.[0-9]{1,2})?)\b/);
-    if (match) return { balanceText: `${match[1]} 積分`, reason: 'credits-zh' };
+    if (match) return { balanceText: `${match[1]} 積分`, resetAtText, reason: 'credits-zh' };
   }
 
   const moneyMatch = text.match(/(?:USD\s*)?\$\s*([0-9]+(?:\.[0-9]{1,2})?)/i);
-  if (moneyMatch) return { balanceText: `$${moneyMatch[1]}`, reason: 'money' };
+  if (moneyMatch) return { balanceText: `$${moneyMatch[1]}`, resetAtText, reason: 'money' };
 
   const creditsMatch = text.match(/([0-9]+(?:\.[0-9]{1,2})?)\s*(?:credits?|credit)/i);
-  if (creditsMatch) return { balanceText: `${creditsMatch[1]} credits`, reason: 'credits' };
+  if (creditsMatch) return { balanceText: `${creditsMatch[1]} credits`, resetAtText, reason: 'credits' };
 
   const errorLine = lines.find((line) => /web server is returning an unknown error/i.test(line));
-  if (errorLine) return { balanceText: '頁面錯誤', reason: 'page-error' };
+  if (errorLine) return { balanceText: '頁面錯誤', resetAtText, reason: 'page-error' };
 
   const loginLine = lines.find((line) => /登入或註冊|log in|sign up/i.test(line));
-  if (loginLine) return { balanceText: '請先登入', reason: 'login-required' };
+  if (loginLine) return { balanceText: '請先登入', resetAtText, reason: 'login-required' };
 
   const balanceLine = lines.find((line) => /balance|credits?|remaining|available|剩餘|積分/i.test(line));
 
   return {
     balanceText: balanceLine ? balanceLine : text.replace(/\s+/g, ' ').slice(0, 60),
+    resetAtText,
     reason: 'fallback',
   };
 }
 
 async function readDashboardSnapshot() {
   if (!dashboardWindow || dashboardWindow.isDestroyed()) {
-    return { rawText: '', balanceText: '--', reason: 'empty' };
+    return { rawText: '', balanceText: '--', resetAtText: null, reason: 'empty' };
   }
 
   const rawText = await dashboardWindow.webContents.executeJavaScript(`
@@ -274,11 +288,12 @@ async function performRefresh({ silent = false, forceReload = false } = {}) {
       snapshot = await waitForUsefulDashboardState(6000, 400, { allowFallback: true });
     }
 
-    const { rawText, balanceText, reason } = snapshot;
+    const { rawText, balanceText, resetAtText, reason } = snapshot;
 
     currentState = {
       status: rawText && reason !== 'page-error' ? 'ok' : rawText ? 'error' : 'empty',
       balanceText: rawText ? balanceText : '--',
+      resetAtText: rawText ? resetAtText : null,
       rawText,
       lastUpdated: new Date().toISOString(),
       error: reason === 'page-error' ? '分析頁目前回傳錯誤頁面' : null,
@@ -291,6 +306,7 @@ async function performRefresh({ silent = false, forceReload = false } = {}) {
       ...currentState,
       status: 'error',
       balanceText: '--',
+      resetAtText: null,
       rawText: '',
       error: error instanceof Error ? error.message : String(error),
       lastUpdated: new Date().toISOString(),

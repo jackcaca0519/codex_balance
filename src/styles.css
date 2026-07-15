@@ -78,6 +78,27 @@ body {
   stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
+  transform-origin: center;
+}
+
+.status[data-status="refreshing"] svg {
+  animation: status-spin 0.95s linear infinite;
+}
+
+.status[data-status="opening"] svg {
+  animation: status-nudge 0.9s ease-in-out infinite;
+}
+
+.status[data-status="login"] svg {
+  animation: status-pulse 1.7s ease-in-out infinite;
+}
+
+.status[data-status="error"] svg {
+  animation: status-alert 1.15s ease-in-out infinite;
+}
+
+.status[data-status="ok"] svg {
+  animation: status-pop 0.45s ease-out 1;
 }
 
 .balance {
@@ -181,8 +202,12 @@ body {
 
 .meta {
   margin-top: 8px;
-  min-height: 16px;
-  font-size: 11px;
+  min-height: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  line-height: 1.2;
   color: var(--muted);
 }
 
@@ -253,4 +278,66 @@ button:active {
 
 .error .orbital-meter-progress {
   stroke: var(--error);
+}
+
+@keyframes status-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes status-nudge {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translateX(1.6px);
+    opacity: 1;
+  }
+}
+
+@keyframes status-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.78;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes status-alert {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.84;
+  }
+  20% {
+    transform: translateY(-0.6px);
+  }
+  45% {
+    transform: translateY(0.6px);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-0.3px);
+  }
+}
+
+@keyframes status-pop {
+  0% {
+    transform: scale(0.72);
+    opacity: 0.2;
+  }
+  65% {
+    transform: scale(1.14);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
 }

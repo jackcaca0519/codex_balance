@@ -1,6 +1,7 @@
 const balanceEl = document.getElementById('balance');
 const statusPillEl = document.getElementById('status-pill');
 const updatedEl = document.getElementById('updated');
+const resetAtEl = document.getElementById('reset-at');
 const hintEl = document.getElementById('hint');
 const refreshButton = document.getElementById('refresh');
 const openDashboardButton = document.getElementById('open-dashboard');
@@ -111,6 +112,7 @@ function syncStatusPill(state = currentState) {
   }
 
   statusPillEl.innerHTML = STATUS_ICONS[statusKey];
+  statusPillEl.dataset.status = statusKey;
   statusPillEl.setAttribute('aria-label', label);
   statusPillEl.setAttribute('title', label);
 }
@@ -138,6 +140,8 @@ function setState(state) {
   } else {
     updatedEl.textContent = '尚未更新';
   }
+
+  resetAtEl.textContent = state.resetAtText ? `重設時間 ${state.resetAtText}` : '重設時間 --';
 
   if (state.error) {
     hintEl.textContent = `抓取失敗：${state.error}`;
