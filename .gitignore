@@ -1,0 +1,7 @@
+node_modules/
+dist/
+out/
+outputs/
+.DS_Store
+*.log
+app-state.json

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codex Balance</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="window">
+      <div class="header">
+        <div>
+          <div class="eyebrow">OpenAI</div>
+          <div class="title">Codex 余额</div>
+        </div>
+        <div class="status" id="status-pill">载入中</div>
+      </div>
+
+      <div class="balance" id="balance">--</div>
+      <div class="meta">
+        <span id="updated">尚未更新</span>
+      </div>
+
+      <div class="actions">
+        <button id="refresh">重整</button>
+        <button id="open-dashboard" class="secondary">開啟儀表板</button>
+      </div>
+
+      <div class="hint" id="hint">
+        每 5 分鐘自動更新一次
+      </div>
+    </div>
+
+    <script src="./renderer.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "codex-balance-widget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package:mac": "electron-packager . \"Codex Balance Widget\" --platform=darwin --arch=arm64 --out=outputs --overwrite --prune=true --asar"
+  },
+  "devDependencies": {
+    "electron": "39.0.0",
+    "electron-packager": "^17.1.2"
+  }
+}
