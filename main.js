@@ -67,7 +67,6 @@ function createMainWindow() {
     minimizable: true,
     show: false,
     title: TEST_MODE ? 'Codex Balance Test' : 'Codex Balance',
-    alwaysOnTop: true,
     backgroundColor: '#0f1115',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -76,7 +75,6 @@ function createMainWindow() {
     },
   });
 
-  win.setAlwaysOnTop(true, 'floating');
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
   win.once('ready-to-show', () => {
     positionWindow(win);
@@ -95,7 +93,6 @@ function createDashboardWindow() {
     center: true,
     title: 'Codex Usage Dashboard',
     autoHideMenuBar: true,
-    alwaysOnTop: true,
     webPreferences: {
       partition: 'persist:codex-balance',
       contextIsolation: true,
@@ -429,14 +426,11 @@ ipcMain.handle('open-dashboard', async () => {
     dashboardWindow = createDashboardWindow();
   }
   app.focus({ steal: true });
-  dashboardWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  dashboardWindow.setAlwaysOnTop(true, 'screen-saver');
   dashboardWindow.center();
   if (dashboardWindow.isMinimized()) dashboardWindow.restore();
   dashboardWindow.show();
   dashboardWindow.focus();
   dashboardWindow.webContents.focus();
-  dashboardWindow.moveTop();
   app.dock?.show();
   app.dock?.bounce('critical');
   void refreshBalance({ silent: true });
