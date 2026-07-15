@@ -2,12 +2,13 @@
   color-scheme: dark;
   --bg: rgba(16, 18, 24, 0.96);
   --panel: rgba(255, 255, 255, 0.06);
-  --panel-strong: rgba(255, 255, 255, 0.1);
   --text: #f2f5f7;
   --muted: #a3adba;
   --accent: #7ee0c3;
+  --accent-strong: #59d7ff;
   --warn: #f5b971;
   --error: #ff8a8a;
+  --meter-pct: 0%;
 }
 
 html,
@@ -25,11 +26,14 @@ body {
 
 .window {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  padding: 14px 14px 12px;
+  min-height: 220px;
+  padding: 8px 14px 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
   backdrop-filter: blur(24px);
 }
 
@@ -48,48 +52,157 @@ body {
 }
 
 .title {
-  margin-top: 3px;
-  font-size: 18px;
+  margin-top: 2px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .status {
   margin-top: 1px;
-  padding: 6px 10px;
+  width: 38px;
+  height: 28px;
   border-radius: 999px;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text);
-  background: var(--panel);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.status svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .balance {
-  margin-top: 16px;
-  font-size: 38px;
+  margin-top: 2px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
+  max-height: 68px;
+  overflow: hidden;
+  text-wrap: balance;
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.balance.long {
+  font-size: 17px;
+  line-height: 1.05;
+  max-height: 54px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 58px;
+  gap: 10px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.balance-panel {
+  min-width: 0;
+}
+
+.sub-balance {
+  margin-top: 4px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(242, 245, 247, 0.58);
+}
+
+.orbital-meter {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  justify-self: end;
+}
+
+.orbital-meter-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.orbital-meter-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 5;
+}
+
+.orbital-meter-progress {
+  fill: none;
+  stroke: url(#unused);
+  stroke: var(--accent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 175.93;
+  stroke-dashoffset: 175.93;
+  transition: stroke-dashoffset 720ms cubic-bezier(0.2, 0.9, 0.2, 1), stroke 220ms ease;
+}
+
+.orbital-meter-core {
+  position: absolute;
+  inset: 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(18, 22, 30, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.orbital-meter-value {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #f6fffb;
+}
+
+.orbital-meter.is-passive .orbital-meter-fill {
+  background: none;
+}
+
+.orbital-meter.is-passive .orbital-meter-value {
+  color: rgba(242, 245, 247, 0.68);
+}
+
+.orbital-meter.is-passive .orbital-meter-progress {
+  stroke: rgba(255, 255, 255, 0.16);
 }
 
 .meta {
   margin-top: 8px;
-  min-height: 18px;
-  font-size: 12px;
+  min-height: 16px;
+  font-size: 11px;
   color: var(--muted);
 }
 
 .actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.actions button {
+  width: 100%;
 }
 
 button {
   appearance: none;
   border: 0;
   border-radius: 12px;
-  padding: 10px 12px;
-  font-size: 13px;
+  padding: 7px 12px;
+  font-size: 11px;
   font-weight: 700;
   color: #091015;
   background: linear-gradient(180deg, #c6f8e6, #7ee0c3);
@@ -109,9 +222,14 @@ button:active {
 }
 
 .hint {
-  margin-top: 12px;
-  font-size: 11px;
+  margin-top: auto;
+  padding-top: 3px;
+  font-size: 9px;
+  line-height: 1.15;
   color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .error .status {
@@ -127,4 +245,12 @@ button:active {
 .ok .status {
   background: rgba(126, 224, 195, 0.14);
   color: var(--accent);
+}
+
+.loading .orbital-meter-progress {
+  filter: saturate(0.8) brightness(0.92);
+}
+
+.error .orbital-meter-progress {
+  stroke: var(--error);
 }

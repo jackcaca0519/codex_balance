@@ -22,8 +22,10 @@ npm start
 npm run package:mac
 ```
 
-打包结果会在 `outputs/Codex Balance Widget-darwin-arm64/Codex Balance Widget.app`
-。
+打包结果会在：
+
+- `outputs/Codex Balance Widget-darwin-arm64/Codex Balance Widget.app`
+- `outputs/codex-balance-widget-mac.zip`
 
 ## 首次使用
 

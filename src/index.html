@@ -13,10 +13,24 @@
           <div class="eyebrow">OpenAI</div>
           <div class="title">Codex 余额</div>
         </div>
-        <div class="status" id="status-pill">载入中</div>
+        <div class="status" id="status-pill" aria-label="載入中" title="載入中"></div>
       </div>
 
-      <div class="balance" id="balance">--</div>
+      <div class="hero">
+        <div class="balance-panel">
+          <div class="balance" id="balance">--</div>
+          <div class="sub-balance" id="sub-balance">Waiting for usage data</div>
+        </div>
+        <div class="orbital-meter" id="orbital-meter" aria-hidden="true">
+          <svg class="orbital-meter-svg" viewBox="0 0 72 72">
+            <circle class="orbital-meter-track" cx="36" cy="36" r="28"></circle>
+            <circle class="orbital-meter-progress" id="orbital-meter-progress" cx="36" cy="36" r="28"></circle>
+          </svg>
+          <div class="orbital-meter-core">
+            <span class="orbital-meter-value" id="orbital-meter-value">--</span>
+          </div>
+        </div>
+      </div>
       <div class="meta">
         <span id="updated">尚未更新</span>
       </div>
