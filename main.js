@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const USAGE_URL = 'https://chatgpt.com/codex/settings/usage';
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+const REFRESH_INTERVAL_MS = 2 * 60 * 1000;
 const TEST_MODE = process.env.CODEX_BALANCE_TEST_MODE === '1';
 
 let mainWindow;
@@ -369,7 +369,7 @@ async function refreshBalanceWithTimeout(options = {}, timeoutMs = 15000) {
 function startPolling() {
   clearInterval(refreshTimer);
   refreshTimer = setInterval(() => {
-    void refreshBalance({ silent: true });
+    void refreshBalance({ silent: true, forceReload: true });
   }, REFRESH_INTERVAL_MS);
 }
 

@@ -148,7 +148,7 @@ function setState(state) {
   } else if (state.balanceText === '請先登入') {
     hintEl.textContent = '目前讀到的是登入頁，請在儀表板視窗完成登入';
   } else if (state.rawText) {
-    hintEl.textContent = '每 5 分鐘自動更新一次';
+    hintEl.textContent = '每 2 分鐘自動更新一次';
   } else {
     hintEl.textContent = '請先登入並打開 Usage Dashboard';
   }
